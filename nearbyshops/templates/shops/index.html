@@ -1,22 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Nearby Shops</title>
-</head>
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+    <!-- set map height -->
+    <style>
+      #map {
+        height: 500px;
+      }
+      .subtitle {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
 
-<body>
-
+  <body>
     <h1>Nearby Shops</h1>
     {% if shops %}
     <ul>
-        {% for shop in shops %}
-        <li>
-            {{ shop.name }} : {{shop.distance}} 
-        </li>
-        {% endfor %}
+      {% for shop in shops %}
+      <li>{{ shop.name }}: {{ shop.distance }}</li>
+      {% endfor %}
     </ul>
     {% endif %}
-</body>
+    <h3 class="subtitle">Check them out on the map below</h3>
+    <!-- map -->
+    <div id="map"></div>
+    <!-- map js -->
+    <script>
+      var map = L.map("map").setView([39.2896174612871, -76.61226234421926], 17);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.marker([39.2896174612871, -76.61226234421926])
+        .addTo(map)
+        .bindPopup("Closest shops<br>to your location<br>in Baltimore")
+        .openPopup();
+
+      // for each shop
+      {% for shop in shops %}
+      var circle = L.circle([{{ shop.location.y }}, {{ shop.location.x }}], {
+        color: "red",
+        fillColor: "#f03",
+        fillOpacity: 0.5,
+        radius: 10,
+      }).addTo(map)
+        .bindPopup("{{shop.name}}");
+      {% endfor %}
+    </script>
+  </body>
 </html>
